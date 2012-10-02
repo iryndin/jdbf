@@ -1,0 +1,37 @@
+<project name="jdbf" default="jar" basedir=".">
+	
+	<description>jdbf - Java library to write/read DBF files</description>
+
+	<property name="src.dir"           location="${basedir}/src" />
+	<property name="build.dir"         location="${basedir}/build" />
+	<property name="src.generated.dir" location="${build.dir}/java_generated_${version.tag}" />
+	<property name="classes.dir"       location="${build.dir}/classes"/>
+	<property name="dist.dir"          location="${build.dir}/dist"/>
+	<property name="jar.filename"      location="${dist.dir}/jdbf.jar"/>
+	
+	<path id="main.classpath">
+		<pathelement path="${classes.dir}" />
+	</path>
+
+	<target name="mkdirs">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="compile" description="compile the source" depends="clean,mkdirs">
+		<javac destdir="${classes.dir}"  debug="true">
+			<src path="${src.dir}"/>
+			<classpath refid="main.classpath" />
+		</javac>
+	</target>
+	
+	<target name="jar" description="Create JAR file" depends="compile">
+	    <jar destfile="${jar.filename}" basedir="${classes.dir}"/>
+	</target>
+	
+</project>
