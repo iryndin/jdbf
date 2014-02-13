@@ -1,12 +1,13 @@
 package net.iryndin.jdbf.reader;
 
+import net.iryndin.jdbf.core.DbfMetadata;
+import net.iryndin.jdbf.core.DbfRecord;
+import net.iryndin.jdbf.util.DbfMetadataUtils;
+
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import net.iryndin.jdbf.core.DbfMetadata;
-import net.iryndin.jdbf.core.DbfRecord;
-import net.iryndin.jdbf.util.DbfMetadataUtils;
 
 public class DbfReader {
 	
@@ -27,7 +28,10 @@ public class DbfReader {
 		metadata = new DbfMetadata();
 		readHeader();
 		DbfMetadataUtils.readFields(metadata, raf);
+
 		oneRecordBuffer = new byte[metadata.getOneRecordLength()];
+
+        findFirstRecord();
 	}
 
 	private void readHeader() throws IOException {
@@ -44,6 +48,10 @@ public class DbfReader {
 	public void close() throws IOException {
 		raf.close();
 	}
+
+    public void findFirstRecord() throws IOException {
+        raf.seek(metadata.getFullHeaderLength());
+    }
 	
 	public DbfRecord read() throws IOException {
 		try {
