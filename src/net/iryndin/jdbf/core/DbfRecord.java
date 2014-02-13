@@ -1,5 +1,8 @@
 package net.iryndin.jdbf.core;
 
+import net.iryndin.jdbf.util.BitUtils;
+import net.iryndin.jdbf.util.JdbfUtils;
+
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.text.ParseException;
@@ -7,9 +10,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import net.iryndin.jdbf.util.BitUtils;
-import net.iryndin.jdbf.util.JdbfUtils;
 
 public class DbfRecord {
 	private byte[] bytes;
@@ -103,9 +103,13 @@ public class DbfRecord {
 	public BigDecimal getBigDecimal(String fieldName) {
 		DbfField f = getField(fieldName);
 		String s = getString(fieldName);
-		if (s == null) {
+
+        if (s == null || s.trim().length() == 0) {
 			return null;
-		}
+		} else {
+            s = s.trim();
+        }
+
 		//MathContext mc = new MathContext(f.getNumberOfDecimalPlaces());
 		//return new BigDecimal(s, mc);
 		return new BigDecimal(s);
