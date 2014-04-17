@@ -4,65 +4,90 @@ import net.iryndin.jdbf.core.DbfMetadata;
 import net.iryndin.jdbf.core.DbfRecord;
 import net.iryndin.jdbf.util.DbfMetadataUtils;
 
-import java.io.EOFException;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 
 public class DbfReader {
-	
-	private RandomAccessFile raf;
-	private DbfMetadata metadata;
-	private byte[] oneRecordBuffer;
-	
-	public DbfReader(File file) throws IOException {
-		this.raf = new RandomAccessFile(file, "r");
-		readMetadata();
-	}
-	
-	public DbfMetadata getMetadata() {
-		return metadata;
-	}
 
-	private void readMetadata() throws IOException {
-		metadata = new DbfMetadata();
-		readHeader();
-		DbfMetadataUtils.readFields(metadata, raf);
+    private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
-		oneRecordBuffer = new byte[metadata.getOneRecordLength()];
+    private ByteArrayInputStream inputStream;
+    private DbfMetadata metadata;
+    private byte[] oneRecordBuffer;
+
+    public DbfReader(File file) throws IOException {
+        this(new FileInputStream(file));
+    }
+
+    public DbfReader(InputStream inputStream) throws IOException {
+        this.inputStream = new ByteArrayInputStream(toByteArray(inputStream));
+
+        readMetadata();
+    }
+
+    public DbfMetadata getMetadata() {
+        return metadata;
+    }
+
+    private void readMetadata() throws IOException {
+        metadata = new DbfMetadata();
+        readHeader();
+        DbfMetadataUtils.readFields(metadata, inputStream);
+
+        oneRecordBuffer = new byte[metadata.getOneRecordLength()];
 
         findFirstRecord();
-	}
+    }
 
-	private void readHeader() throws IOException {
-		// 1. Allocate buffer
-		byte[] bytes = new byte[16];
-		// 2. Read 16 bytes
-		raf.readFully(bytes);
-		// 3. Fill header fields
-		DbfMetadataUtils.fillHeaderFields(metadata,bytes);		
-		// 4. Read next 16 bytes (for most DBF types these are reserved bytes)
-		raf.readFully(bytes);
-	}
+    private void readHeader() throws IOException {
+        // 1. Allocate buffer
+        byte[] bytes = new byte[16];
+        // 2. Read 16 bytes
+        inputStream.read(bytes);
+        // 3. Fill header fields
+        DbfMetadataUtils.fillHeaderFields(metadata, bytes);
+        // 4. Read next 16 bytes (for most DBF types these are reserved bytes)
+        inputStream.read(bytes);
+    }
 
-	public void close() throws IOException {
-		raf.close();
-	}
+    public void close() throws IOException {
+        inputStream.close();
+    }
 
     public void findFirstRecord() throws IOException {
-        raf.seek(metadata.getFullHeaderLength());
+        seek(inputStream, metadata.getFullHeaderLength());
     }
-	
-	public DbfRecord read() throws IOException {
-		try {
-			raf.readFully(oneRecordBuffer);
-			return createDbfRecord();
-		} catch (EOFException eofe) {
-			return null;
-		}
-	}
 
-	private DbfRecord createDbfRecord() {
-		return new DbfRecord(oneRecordBuffer, metadata);
-	}
+    private void seek(ByteArrayInputStream inputStream, int position) {
+        inputStream.reset();
+        inputStream.skip(position);
+    }
+
+    public DbfRecord read() throws IOException {
+        int readLength = inputStream.read(oneRecordBuffer);
+
+        if (readLength == -1) {
+            return null;
+        }
+
+        return createDbfRecord();
+    }
+
+    private DbfRecord createDbfRecord() {
+        return new DbfRecord(oneRecordBuffer, metadata);
+    }
+
+    private static byte[] toByteArray(InputStream input) throws IOException {
+        byte[] result = new byte[input.available()];
+
+        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+        int offset = 0;
+        int bufferLength;
+        while ((bufferLength = input.read(buffer)) > 0) {
+            System.arraycopy(buffer, 0, result, offset, bufferLength);
+
+            offset += bufferLength;
+        }
+
+        return result;
+    }
 }
