@@ -77,17 +77,14 @@ public class DbfReader {
     }
 
     private static byte[] toByteArray(InputStream input) throws IOException {
-        byte[] result = new byte[input.available()];
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-        int offset = 0;
-        int bufferLength;
-        while ((bufferLength = input.read(buffer)) > 0) {
-            System.arraycopy(buffer, 0, result, offset, bufferLength);
-
-            offset += bufferLength;
+        byte[] data = new byte[DEFAULT_BUFFER_SIZE];
+        int dataLength;
+        while ((dataLength = input.read(data)) > 0) {
+            buffer.write(data, 0, dataLength);
         }
 
-        return result;
+        return buffer.toByteArray();
     }
 }
