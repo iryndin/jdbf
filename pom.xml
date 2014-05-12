@@ -1,0 +1,70 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>net.iryndin</groupId>
+    <artifactId>jdbf</artifactId>
+    <version>1.1</version>
+    <packaging>jar</packaging>
+    
+    <name>jdbf</name>
+    <url>http://github.com/iryndin/jdbf</url>    
+    <description>jdbf - Java library to write/read DBF files</description>
+
+    
+    <scm>
+        <url>https://github.com/iryndin/jdbf</url>
+    </scm>
+
+    <licenses>
+        <license>
+            <distribution>repo</distribution>
+            <name>Apache License, Version 2.0</name>
+            <url>http://apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    
+    <dependencies/>
+    
+    <developers>
+        <developer>
+            <name>Ivan Ryndin</name>
+            <id>iryndin</id>
+            <roles>
+                <role>Project Owner</role>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>bugy</name>
+            <id>bugy</id>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+    <contributors>
+        <contributor>
+            <name>bugy</name>
+        </contributor>
+    </contributors>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+
+        <maven.compiler.version>3.1</maven.compiler.version>
+    </properties>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+    
+</project>
