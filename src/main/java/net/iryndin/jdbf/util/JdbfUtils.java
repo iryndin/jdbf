@@ -17,13 +17,13 @@ public class JdbfUtils {
 	public static final int FIELD_RECORD_LENGTH = 32;
 	public static final int HEADER_TERMINATOR = 0x0D;	
 	
-	public static ThreadLocal<SimpleDateFormat> dateFormatRef = new ThreadLocal<SimpleDateFormat>();
-	
-	static {
-		SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd");
-		dateFormatRef.set(f);
-	}
-			
+	public static final ThreadLocal<SimpleDateFormat> dateFormatRef = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyyMMdd");
+        }
+    };
+
 	public static List<DbfField> createFieldsFromString(String fieldsString) {
 		List<DbfField> list = new ArrayList<DbfField>();
 		String[] a = fieldsString.split("\\|");
