@@ -1,5 +1,6 @@
 package net.iryndin.jdbf.core;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -70,7 +71,7 @@ public class DbfMetadata {
 	}
 	
 	private void processFields(List<DbfField> fields) {
-		fieldMap = new LinkedHashMap<String,DbfField>(fields.size()*2);
+		fieldMap = new LinkedHashMap<>(fields.size()*2);
 		int offset = 1;
 		for (DbfField f : fields) {
 			// 1. count offset
@@ -97,10 +98,14 @@ public class DbfMetadata {
 		}
 		return sb.toString();
 	}
+
+    private String formatUpdateDate() {
+        return new SimpleDateFormat("yyyy-MM-dd").format(updateDate);
+    }
 	@Override
 	public String toString() {
 		return "DbfMetadata [\n  type=" + type + ", \n  updateDate="
-				+ updateDate + ", \n  recordsQty=" + recordsQty
+				+ formatUpdateDate() + ", \n  recordsQty=" + recordsQty
 				+ ", \n  fullHeaderLength=" + fullHeaderLength
 				+ ", \n  oneRecordLength=" + oneRecordLength
 				+ ", \n  uncompletedTxFlag=" + uncompletedTxFlag

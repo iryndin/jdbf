@@ -3,6 +3,4 @@ jdbf
 
 Java utility to read/write DBF files
 
-Please see for examples: 
-
-http://iryndin.net/projects/jdbf
+Version 2.0 - add ability to read MEMO files (tested with Visual FoxPro DBFs)

@@ -62,7 +62,7 @@ public class DbfMetadataUtils {
     }
 
     public static void readFields(DbfMetadata metadata, ByteArrayInputStream inputStream) throws IOException {
-        List<DbfField> fields = new ArrayList<DbfField>();
+        List<DbfField> fields = new ArrayList<>();
         byte[] fieldBytes = new byte[JdbfUtils.FIELD_RECORD_LENGTH];
         int headerLength = 0;
         int fieldLength = 0;

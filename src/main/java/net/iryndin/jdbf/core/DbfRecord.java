@@ -1,8 +1,10 @@
 package net.iryndin.jdbf.core;
 
+import net.iryndin.jdbf.reader.MemoReader;
 import net.iryndin.jdbf.util.BitUtils;
 import net.iryndin.jdbf.util.JdbfUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.text.ParseException;
@@ -17,12 +19,14 @@ public class DbfRecord {
 
     private byte[] bytes;
     private DbfMetadata metadata;
+    private MemoReader memoReader;
     private Charset stringCharset;
 
-    public DbfRecord(byte[] source, DbfMetadata metadata) {
+    public DbfRecord(byte[] source, DbfMetadata metadata, MemoReader memoReader) {
         this.bytes = new byte[source.length];
         System.arraycopy(source, 0, this.bytes, 0, source.length);
         this.metadata = metadata;
+        this.memoReader = memoReader;
     }
 
     public DbfRecord(DbfMetadata metadata) {
@@ -48,10 +52,11 @@ public class DbfRecord {
     }
 
     public String getString(String fieldName) {
-        if (stringCharset == null) {
-            stringCharset = Charset.defaultCharset();
+        Charset charset = this.stringCharset;
+        if (charset == null) {
+            charset = Charset.defaultCharset();
         }
-        return getString(fieldName, stringCharset);
+        return getString(fieldName, charset);
     }
 
     public String getString(String fieldName, String charsetName) {
@@ -60,18 +65,22 @@ public class DbfRecord {
 
     public String getString(String fieldName, Charset charset) {
         DbfField f = getField(fieldName);
+        if (f.getType() == DbfFieldTypeEnum.Memo) {
+            return getMemoAsString(f, charset);
+        }
         int actualOffset = f.getOffset();
         int actualLength = f.getLength();
 
+        byte[] fieldBytes = new byte[actualLength];
+        System.arraycopy(bytes, actualOffset, fieldBytes, 0, actualLength);
+
         // check for empty strings
-        while ((actualLength > 0)
-                && (bytes[actualOffset] == JdbfUtils.EMPTY)) {
+        while ((actualLength > 0) && (bytes[actualOffset] == JdbfUtils.EMPTY)) {
             actualOffset++;
             actualLength--;
         }
 
-        while ((actualLength > 0)
-                && (bytes[actualOffset + actualLength - 1] == JdbfUtils.EMPTY)) {
+        while ((actualLength > 0) && (bytes[actualOffset + actualLength - 1] == JdbfUtils.EMPTY)) {
             actualLength--;
         }
 
@@ -99,6 +108,40 @@ public class DbfRecord {
 		}
 		return new String(b, 0, actualLength, charset);
 		*/
+    }
+
+    public byte[] getMemoAsBytes(String fieldName) throws IOException {
+        DbfField f = getField(fieldName);
+        if (f.getType() != DbfFieldTypeEnum.Memo) {
+            throw new IllegalArgumentException("Field '" + fieldName + "' is not MEMO field!");
+        }
+        byte[] dbfFieldBytes = new byte[f.getLength()];
+        System.arraycopy(bytes, f.getOffset(), dbfFieldBytes, 0, f.getLength());
+        int offsetInBlocks = BitUtils.makeInt(dbfFieldBytes[0],dbfFieldBytes[1],dbfFieldBytes[2],dbfFieldBytes[3]);
+        return memoReader.read(offsetInBlocks).getValue();
+    }
+
+    public String getMemoAsString(String fieldName, Charset charset) throws IOException {
+        DbfField f = getField(fieldName);
+        if (f.getType() != DbfFieldTypeEnum.Memo) {
+            throw new IllegalArgumentException("Field '" + fieldName + "' is not MEMO field!");
+        }
+        byte[] dbfFieldBytes = new byte[f.getLength()];
+        System.arraycopy(bytes, f.getOffset(), dbfFieldBytes, 0, f.getLength());
+        int offsetInBlocks = BitUtils.makeInt(dbfFieldBytes[0],dbfFieldBytes[1],dbfFieldBytes[2],dbfFieldBytes[3]);
+        return memoReader.read(offsetInBlocks).getValueAsString(charset);
+    }
+
+    public String getMemoAsString(String fieldName) throws IOException {
+        Charset charset = getStringCharset();
+        if (charset == null) {
+            charset = Charset.defaultCharset();
+        }
+        return getMemoAsString(fieldName, charset);
+    }
+
+    private String getMemoAsString(DbfField field, Charset charset) {
+        return null;
     }
 
     public Date getDate(String fieldName) throws ParseException {
@@ -181,7 +224,8 @@ public class DbfRecord {
             sb.append(f.getName()).append("=");
             switch (f.getType()) {
                 case Character: {
-                    String s = getString(f.getName(), "Cp866");
+                    //String s = getString(f.getName(), "Cp866");
+                    String s = getString(f.getName());
                     //System.out.println(f.getName()+"="+s);
                     sb.append(s);
                     break;
@@ -241,5 +285,14 @@ public class DbfRecord {
         }
 
         return map;
+    }
+
+    public String getMemo(String fieldName) {
+        Charset charset = this.stringCharset;
+        if (charset == null) {
+            charset = Charset.defaultCharset();
+        }
+        DbfField f = getField(fieldName);
+        return f.toString();
     }
 }
