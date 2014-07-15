@@ -65,9 +65,6 @@ public class DbfRecord {
 
     public String getString(String fieldName, Charset charset) {
         DbfField f = getField(fieldName);
-        if (f.getType() == DbfFieldTypeEnum.Memo) {
-            return getMemoAsString(f, charset);
-        }
         int actualOffset = f.getOffset();
         int actualLength = f.getLength();
 
@@ -138,10 +135,6 @@ public class DbfRecord {
             charset = Charset.defaultCharset();
         }
         return getMemoAsString(fieldName, charset);
-    }
-
-    private String getMemoAsString(DbfField field, Charset charset) {
-        return null;
     }
 
     public Date getDate(String fieldName) throws ParseException {
@@ -285,14 +278,5 @@ public class DbfRecord {
         }
 
         return map;
-    }
-
-    public String getMemo(String fieldName) {
-        Charset charset = this.stringCharset;
-        if (charset == null) {
-            charset = Charset.defaultCharset();
-        }
-        DbfField f = getField(fieldName);
-        return f.toString();
     }
 }
