@@ -10,6 +10,14 @@ import java.io.*;
 
 /**
  * Reader of memo files (tested of *.FPT files - Visual FoxPro)
+ * See links: 
+ * 
+ * Visual FoxPro file formats:
+ * http://msdn.microsoft.com/en-us/library/aa977077(v=vs.71).aspx
+ * 
+ * DBase file formats:
+ * http://www.dbase.com/Knowledgebase/INT/db7_file_fmt.htm
+ * 
  */
 public class MemoReader implements Closeable {
 
