@@ -53,12 +53,25 @@ public class DbfMetadataUtils {
 
     public static void fillHeaderFields(DbfMetadata metadata, byte[] headerBytes) {
         metadata.setType(DbfFileTypeEnum.fromInt(headerBytes[0]));
-        metadata.setUpdateDate(JdbfUtils.createDate(headerBytes[1], headerBytes[2], headerBytes[3]));
+        metadata.setUpdateDate(parseHeaderUpdateDate(headerBytes[1], headerBytes[2], headerBytes[3], metadata.getType()));
         metadata.setRecordsQty(BitUtils.makeInt(headerBytes[4], headerBytes[5], headerBytes[6], headerBytes[7]));
         metadata.setFullHeaderLength(BitUtils.makeInt(headerBytes[8], headerBytes[9]));
         metadata.setOneRecordLength(BitUtils.makeInt(headerBytes[10], headerBytes[11]));
         metadata.setUncompletedTxFlag(headerBytes[14]);
         metadata.setEcnryptionFlag(headerBytes[15]);
+    }
+
+    @SuppressWarnings("deprecation")
+    public static Date parseHeaderUpdateDate(byte yearByte, byte monthByte, byte dayByte, DbfFileTypeEnum fileType) {
+        int year = yearByte + 2000 - 1900;
+        switch (fileType) {
+            case FoxBASEPlus1:
+                year = yearByte;
+        }
+        int month = monthByte - 1;
+        int day = dayByte;
+        return new Date(year,month,day);
+
     }
 
     public static void readFields(DbfMetadata metadata, ByteArrayInputStream inputStream) throws IOException {

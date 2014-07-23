@@ -52,14 +52,6 @@ public class JdbfUtils {
 		return f;
 	}
 
-	@SuppressWarnings("deprecation")
-	public static Date createDate(byte b1, byte b2, byte b3) {
-		int year = b1 + 2000 - 1900;
-		int month = b2 - 1;
-		int day = b3;
-		return new Date(year,month,day);
-	}
-	
 	public static byte[] writeDateForHeader(Date date) {
 		byte[] headerBytes = {
 			(byte)(date.getYear()-100),
