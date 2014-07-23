@@ -5,6 +5,7 @@ import net.iryndin.jdbf.util.DbfMetadataUtils;
 import net.iryndin.jdbf.util.IOUtils;
 
 import java.io.*;
+import java.util.Arrays;
 
 public class DbfReader implements Closeable {
 
@@ -12,6 +13,7 @@ public class DbfReader implements Closeable {
     private MemoReader memoReader;
     private DbfMetadata metadata;
     private byte[] oneRecordBuffer;
+    private int recordsCounter = 0;
 
     public DbfReader(File dbfFile) throws IOException {
         this(new FileInputStream(dbfFile));
@@ -61,10 +63,14 @@ public class DbfReader implements Closeable {
     public void close() throws IOException {
         if (memoReader != null) {
             memoReader.close();
+            memoReader = null;
         }
         if (dbfInputStream != null) {
             dbfInputStream.close();
+            dbfInputStream = null;
         }
+        metadata = null;
+        recordsCounter = 0;
     }
 
     public void findFirstRecord() throws IOException {
@@ -77,9 +83,10 @@ public class DbfReader implements Closeable {
     }
 
     public DbfRecord read() throws IOException {
+        Arrays.fill(oneRecordBuffer, (byte)0x0);
         int readLength = dbfInputStream.read(oneRecordBuffer);
 
-        if (readLength == -1) {
+        if (readLength < metadata.getOneRecordLength()) {
             return null;
         }
 
@@ -87,6 +94,6 @@ public class DbfReader implements Closeable {
     }
 
     private DbfRecord createDbfRecord() {
-        return new DbfRecord(oneRecordBuffer, metadata, memoReader);
+        return new DbfRecord(oneRecordBuffer, metadata, memoReader, ++recordsCounter);
     }
 }

@@ -21,14 +21,17 @@ public class DbfRecord {
     private DbfMetadata metadata;
     private MemoReader memoReader;
     private Charset stringCharset;
+    private final int recordNumber;
 
-    public DbfRecord(byte[] source, DbfMetadata metadata, MemoReader memoReader) {
+    public DbfRecord(byte[] source, DbfMetadata metadata, MemoReader memoReader, int recordNumber) {
+        this.recordNumber = recordNumber;
         this.bytes = new byte[source.length];
         System.arraycopy(source, 0, this.bytes, 0, source.length);
         this.metadata = metadata;
         this.memoReader = memoReader;
     }
 
+    /*
     public DbfRecord(DbfMetadata metadata) {
         this.metadata = metadata;
         fillBytesFromMetadata();
@@ -36,8 +39,9 @@ public class DbfRecord {
 
     private void fillBytesFromMetadata() {
         bytes = new byte[metadata.getOneRecordLength()];
-        BitUtils.memset(bytes, 0x20);
+        BitUtils.memset(bytes, JdbfUtils.EMPTY);
     }
+    */
 
     public Charset getStringCharset() {
         return stringCharset;
@@ -49,6 +53,10 @@ public class DbfRecord {
 
     public byte[] getBytes() {
         return bytes;
+    }
+
+    public int getRecordNumber() {
+        return recordNumber;
     }
 
     public String getString(String fieldName) {

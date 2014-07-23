@@ -24,6 +24,7 @@ public class TestMemo {
 
         try (DbfReader reader = new DbfReader(dbf, memo)) {
             DbfMetadata meta = reader.getMetadata();
+            System.out.println("Read DBF Metadata: " + meta);
 
             assertEquals(5, meta.getField("TEXVER").getLength());
             assertEquals(DbfFieldTypeEnum.Character, meta.getField("TEXVER").getType());
