@@ -1,9 +1,14 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.iryndin.jdbf.core.DbfFileTypeEnum;
 import net.iryndin.jdbf.core.DbfMetadata;
 import net.iryndin.jdbf.core.DbfRecord;
 import net.iryndin.jdbf.reader.DbfReader;
@@ -25,6 +30,7 @@ public class JdbfMain {
 		//method4(args);
 		//method5(args);
 		method6(args);
+                method7(args);
 	}
 	
 	public static void method5(String[] args) throws Exception {	
@@ -82,7 +88,32 @@ public class JdbfMain {
 		//File file = new File("data/218864/gds_im.dbf");
 		testReadWriteReadFile(file);
 	}
-	
+        
+        /**
+         * Example: Write to DBF
+         */
+        public static void method7(String[] args) throws FileNotFoundException, IOException, ParseException {
+            // Set metadata
+            String fieldsInfo = "KONTR,C,1,0|N_MDP,C,8,0";
+            DbfMetadata meta = DbfMetadataUtils.fromFieldsString(fieldsInfo);
+            meta.setType(DbfFileTypeEnum.dBASEIV3);
+            
+            // Create output stream and DBF file
+            FileOutputStream out = new FileOutputStream("1.dbf");
+            DbfWriter writer = new DbfWriter(meta,out);
+            writer.setStringCharset("Cp866");
+            
+            // Write to file
+            List<Map<String,Object>> maps = new ArrayList<Map<String,Object>>();
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("KONTR", "a");
+            map.put("N_MDP", "2");
+            writer.write(map);
+            
+            // The end
+            writer.close();
+        }
+        
 	static void testReadWriteReadFile(File file)  throws Exception  {
 		Charset stringCharset = Charset.forName("Cp866");
 		
