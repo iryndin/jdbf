@@ -3,6 +3,10 @@ jdbf
 
 Java utility to read/write DBF files
 
+### Version 2.0.2
+
+Fix issue [#7](https://github.com/iryndin/jdbf/issues/7) - add DbfRecord.isDeleted() method that checks if record is deleted.
+
 ### Version 2.0.1 
 
 Fix issue [#3](https://github.com/iryndin/jdbf/issues/3) - read the last record two times for "FoxBASE+/Dbase III plus" files
