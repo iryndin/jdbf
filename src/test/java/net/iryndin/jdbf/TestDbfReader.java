@@ -31,6 +31,7 @@ public class TestDbfReader {
             int recCounter = 0;
             while ((rec = reader.read()) != null) {
                 rec.setStringCharset(stringCharset);
+                System.out.println("Record is DELETED: " + rec.isDeleted());
                 System.out.println(rec.getRecordNumber());
                 System.out.println(rec.toMap());
 
@@ -57,6 +58,7 @@ public class TestDbfReader {
             int recCounter = 0;
             while ((rec = reader.read()) != null) {
                 rec.setStringCharset(stringCharset);
+                System.out.println("Record is DELETED: " + rec.isDeleted());
                 System.out.println(rec.getRecordNumber());
                 System.out.println(rec.toMap());
 

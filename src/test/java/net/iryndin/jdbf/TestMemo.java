@@ -45,6 +45,7 @@ public class TestMemo {
             while ((rec = reader.read()) != null) {
                 rec.setStringCharset(stringCharset);
 
+                System.out.println("Record is DELETED: " + rec.isDeleted());
                 System.out.println("TEXVER: " + rec.getString("TEXVER"));
                 System.out.println("TEXTEX: " + rec.getMemoAsString("TEXTEX"));
                 System.out.println("TEXDAT: " + rec.getDate("TEXDAT"));
