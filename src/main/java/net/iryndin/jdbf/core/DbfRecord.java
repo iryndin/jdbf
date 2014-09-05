@@ -50,7 +50,6 @@ public class DbfRecord {
      * Data records are preceded by one byte, that is, a space (0x20) if the record is not deleted, an asterisk (0x2A) if the record is deleted.
      * So, if record is preceded by 0x2A - it is considered to be deleted
      * All other cases: record is considered to be not deleted
-     * Any other case: exception IllegalStateException is thrown
      * @return
      */
     public boolean isDeleted() {
