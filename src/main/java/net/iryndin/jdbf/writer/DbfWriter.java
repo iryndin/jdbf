@@ -104,9 +104,6 @@ public class DbfWriter {
 	}
 
 	private void writeString(DbfField f, String value) {
-		if (f.getName().equals("G022")) {
-			int a = 1;
-		}
 		byte[] bytes = value.getBytes(stringCharset);
 		if (bytes.length > f.getLength()) {
 			byte[] newBytes = new byte[f.getLength()];
