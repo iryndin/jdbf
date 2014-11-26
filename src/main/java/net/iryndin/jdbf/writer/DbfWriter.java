@@ -9,7 +9,6 @@ import java.util.Map;
 
 import net.iryndin.jdbf.core.DbfField;
 import net.iryndin.jdbf.core.DbfMetadata;
-import net.iryndin.jdbf.core.DbfRecord;
 import net.iryndin.jdbf.util.BitUtils;
 import net.iryndin.jdbf.util.DbfMetadataUtils;
 import net.iryndin.jdbf.util.JdbfUtils;
@@ -81,9 +80,6 @@ public class DbfWriter {
 	}
 	
 	private void writeBigDecimal(DbfField f, BigDecimal value) {
-		if (f.getName().equals("G05_NTF")) {
-			int a = 1;
-		}
 		String s = value.toPlainString();
 		byte[] bytes = s.getBytes();
 		if (bytes.length > f.getLength()) {
