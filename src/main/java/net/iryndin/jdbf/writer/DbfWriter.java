@@ -98,8 +98,7 @@ public class DbfWriter {
 
 	private void writeDate(DbfField f, Date value) {
 		byte[] bytes = JdbfUtils.writeDate(value);
-		// TODO: 
-		// check that bytes.length = f.getLength();
+		// TODO: check that bytes.length = f.getLength();
 		System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
 	}
 

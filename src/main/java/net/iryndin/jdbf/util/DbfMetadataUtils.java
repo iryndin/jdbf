@@ -31,7 +31,7 @@ public class DbfMetadataUtils {
         return metadata;
     }
 
-    private static int calculateOneRecordLength(List<DbfField> fields) {
+    public static int calculateOneRecordLength(List<DbfField> fields) {
         int result = 0;
         for (DbfField field : fields) {
             result += field.getLength();
@@ -101,10 +101,10 @@ public class DbfMetadataUtils {
         headerLength += 1;
 
         if (headerLength != metadata.getFullHeaderLength()) {
-            // can throw Exception here
+            // TODO: handle this anyway!
         }
         if (fieldLength != metadata.getOneRecordLength()) {
-            // can throw Exception here
+            // TODO: handle this anyway!
         }
 
         metadata.setFields(fields);
