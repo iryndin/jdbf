@@ -13,6 +13,9 @@ public enum DbfFieldTypeEnum {
     Memo('M'),
     General('G'),
     Picture('P'),
+    Blob('W'),
+    Varbinary('Q'),
+    Varchar('V'),
     NullFlags('0');
 
     final char type;
