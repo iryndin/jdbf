@@ -9,11 +9,12 @@ import java.util.Arrays;
 
 public class DbfReader implements Closeable {
 
-    private ByteArrayInputStream dbfInputStream;
+    private InputStream dbfInputStream;
     private MemoReader memoReader;
     private DbfMetadata metadata;
     private byte[] oneRecordBuffer;
     private int recordsCounter = 0;
+    private static final int BUFFER_SIZE = 8192;
 
     public DbfReader(File dbfFile) throws IOException {
         this(new FileInputStream(dbfFile));
@@ -24,12 +25,12 @@ public class DbfReader implements Closeable {
     }
 
     public DbfReader(InputStream dbfInputStream) throws IOException {
-        this.dbfInputStream = new ByteArrayInputStream(IOUtils.toByteArray(dbfInputStream));
+        this.dbfInputStream = new BufferedInputStream(dbfInputStream, BUFFER_SIZE);
         readMetadata();
     }
 
     public DbfReader(InputStream dbfInputStream, InputStream memoInputStream) throws IOException {
-        this.dbfInputStream = new ByteArrayInputStream(IOUtils.toByteArray(dbfInputStream));
+        this.dbfInputStream = new BufferedInputStream(dbfInputStream, BUFFER_SIZE);
         this.memoReader = new MemoReader(memoInputStream);
         readMetadata();
     }
@@ -39,6 +40,7 @@ public class DbfReader implements Closeable {
     }
 
     private void readMetadata() throws IOException {
+        this.dbfInputStream.mark(1024*1024);
         metadata = new DbfMetadata();
         readHeader();
         DbfMetadataUtils.readFields(metadata, dbfInputStream);
@@ -77,7 +79,7 @@ public class DbfReader implements Closeable {
         seek(dbfInputStream, metadata.getFullHeaderLength());
     }
 
-    private void seek(ByteArrayInputStream inputStream, int position) {
+    private void seek(InputStream inputStream, int position) throws IOException {
         inputStream.reset();
         inputStream.skip(position);
     }

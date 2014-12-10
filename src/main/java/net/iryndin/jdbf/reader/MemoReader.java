@@ -21,7 +21,8 @@ import java.io.*;
  */
 public class MemoReader implements Closeable {
 
-    private ByteArrayInputStream memoInputStream;
+    private static final int BUFFER_SIZE = 8192;
+    private InputStream memoInputStream;
     private MemoFileHeader memoHeader;
 
     public MemoReader(File memoFile) throws IOException {
@@ -29,12 +30,13 @@ public class MemoReader implements Closeable {
     }
 
     public MemoReader(InputStream inputStream) throws IOException {
-        this.memoInputStream = new ByteArrayInputStream(IOUtils.toByteArray(inputStream));
+        this.memoInputStream = new BufferedInputStream(inputStream, BUFFER_SIZE);
         readMetadata();
     }
 
     private void readMetadata() throws IOException {
         byte[] headerBytes = new byte[JdbfUtils.MEMO_HEADER_LENGTH];
+        memoInputStream.mark(8192);
         memoInputStream.read(headerBytes);
         this.memoHeader = MemoFileHeader.create(headerBytes);
     }

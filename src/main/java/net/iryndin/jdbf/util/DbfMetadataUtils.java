@@ -5,7 +5,7 @@ import net.iryndin.jdbf.core.DbfFieldTypeEnum;
 import net.iryndin.jdbf.core.DbfFileTypeEnum;
 import net.iryndin.jdbf.core.DbfMetadata;
 
-import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,7 +74,7 @@ public class DbfMetadataUtils {
 
     }
 
-    public static void readFields(DbfMetadata metadata, ByteArrayInputStream inputStream) throws IOException {
+    public static void readFields(DbfMetadata metadata, InputStream inputStream) throws IOException {
         List<DbfField> fields = new ArrayList<>();
         byte[] fieldBytes = new byte[JdbfUtils.FIELD_RECORD_LENGTH];
         int headerLength = 0;
