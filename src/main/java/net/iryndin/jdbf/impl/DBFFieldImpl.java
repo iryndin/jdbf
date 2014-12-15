@@ -22,21 +22,21 @@ public class DBFFieldImpl implements IDBFField {
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override
     public DbfFieldTypeEnum getType() {
-        return null;
+        return type;
     }
 
     @Override
     public int getLength() {
-        return 0;
+        return length;
     }
 
     @Override
     public int getNumberOfDecimalPlaces() {
-        return 0;
+        return numberOfDecimalPlaces;
     }
 }
