@@ -12,12 +12,14 @@ public class DBFFieldImpl implements IDBFField {
     private final DbfFieldTypeEnum type;
     private final int length;
     private final int numberOfDecimalPlaces;
+    private final int offset;
 
-    public DBFFieldImpl(String name, DbfFieldTypeEnum type, int length, int numberOfDecimalPlaces) {
+    public DBFFieldImpl(String name, DbfFieldTypeEnum type, int length, int numberOfDecimalPlaces, int offset) {
         this.name = name;
         this.type = type;
         this.length = length;
         this.numberOfDecimalPlaces = numberOfDecimalPlaces;
+        this.offset = offset;
     }
 
     @Override
@@ -38,5 +40,21 @@ public class DBFFieldImpl implements IDBFField {
     @Override
     public int getNumberOfDecimalPlaces() {
         return numberOfDecimalPlaces;
+    }
+
+    @Override
+    public int getOffset() {
+        return offset;
+    }
+
+    @Override
+    public String toString() {
+        return "DBFFieldImpl{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", length=" + length +
+                ", numberOfDecimalPlaces=" + numberOfDecimalPlaces +
+                ", offset=" + offset +
+                '}';
     }
 }

@@ -100,7 +100,7 @@ public class DBFReaderImpl implements IDBFReader {
 
         @Override
         public void remove() {
-            throw new UnsupportedOperationException("remove is not suported!");
+            throw new UnsupportedOperationException("remove is not supported!");
         }
     };
 }

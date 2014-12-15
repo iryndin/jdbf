@@ -8,6 +8,7 @@ import net.iryndin.jdbf.core.DbfMetadata;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -111,6 +112,7 @@ public class DbfMetadataUtils {
     }
 
     public static DbfField createDbfField(byte[] fieldBytes) {
+        System.out.println(Arrays.toString(fieldBytes));
         DbfField field = new DbfField();
         // 1. Set name
         {

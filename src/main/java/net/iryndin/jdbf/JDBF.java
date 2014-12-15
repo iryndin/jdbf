@@ -3,6 +3,7 @@ package net.iryndin.jdbf;
 import net.iryndin.jdbf.api.IDBFReader;
 import net.iryndin.jdbf.impl.DBFReaderImpl;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -19,5 +20,16 @@ public class JDBF {
      */
     public static IDBFReader createDBFReader(InputStream inputStream) throws IOException {
         return new DBFReaderImpl(inputStream);
+    }
+
+    /**
+     * Factory method that creates IDBFReader
+     *
+     * @param path path to DBF file
+     * @return IDBFReader implementation
+     * @throws IOException if IO errors occur
+     */
+    public static IDBFReader createDBFReader(String path) throws IOException {
+        return createDBFReader(new FileInputStream(path));
     }
 }

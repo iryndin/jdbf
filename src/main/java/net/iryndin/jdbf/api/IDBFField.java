@@ -10,4 +10,5 @@ public interface IDBFField {
     DbfFieldTypeEnum getType();
     int getLength();
     int getNumberOfDecimalPlaces();
+    int getOffset();
 }

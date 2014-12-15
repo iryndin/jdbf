@@ -10,6 +10,7 @@ import net.iryndin.jdbf.util.BitUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -39,14 +40,19 @@ public class DBFMetadataReader {
         if (bytesRead != 16) {
             throw new IOException("When reading DBF header should read exactly 16 bytes! Bytes read instead: " + bytesRead);
         }
+        System.out.println("Header bytes: " + Arrays.toString(headerBytes));
 
         DbfFileTypeEnum type = DbfFileTypeEnum.fromInt(headerBytes[0]);
         Date updateDate = parseHeaderUpdateDate(headerBytes[1], headerBytes[2], headerBytes[3], type);
         int recordsQty = BitUtils.makeInt(headerBytes[4], headerBytes[5], headerBytes[6], headerBytes[7]);
+        // fullHeaderLength or position of first data record
         int fullHeaderLength = BitUtils.makeInt(headerBytes[8], headerBytes[9]);
         int oneRecordLength = BitUtils.makeInt(headerBytes[10], headerBytes[11]);
         byte uncompletedTxFlag = headerBytes[14];
         byte ecnryptionFlag = headerBytes[15];
+
+        // Read next 16 bytes (for most DBF types these are reserved bytes)
+        inputStream.read(headerBytes);
 
         return new DBFHeaderImpl(type, updateDate, recordsQty, fullHeaderLength, oneRecordLength, uncompletedTxFlag, ecnryptionFlag);
     }
@@ -56,10 +62,15 @@ public class DBFMetadataReader {
         byte[] fieldBytes = new byte[FIELD_RECORD_LENGTH];
         int headerLength = 0;
         int fieldLength = 0;
+        // offset == 1
+        // because first (zero-shifted) byte is record flag
+        int offset = 1;
         while (true) {
             inputStream.read(fieldBytes);
-            IDBFField field = readDbfField(fieldBytes);
+            System.out.println(Arrays.toString(fieldBytes));
+            IDBFField field = readDbfField(fieldBytes, offset);
             fields.add(field);
+            offset += field.getLength();
 
             fieldLength += field.getLength();
             headerLength += fieldBytes.length;
@@ -77,12 +88,12 @@ public class DBFMetadataReader {
         headerLength += 32;
         headerLength += 1;
 
-        if (headerLength != header.getFullHeaderLength()) {
-            throw new IllegalStateException("headerLength != header.getFullHeaderLength()");
-        }
-        if (fieldLength != header.getOneRecordLength()) {
-            throw new IllegalStateException("fieldLength != header.getOneRecordLength()");
-        }
+        //if (headerLength != header.getFullHeaderLength()) {
+        //    throw new IllegalStateException("headerLength != header.getFullHeaderLength()");
+        //}
+        //if (fieldLength != header.getOneRecordLength()) {
+        //    throw new IllegalStateException("fieldLength != header.getOneRecordLength()");
+        //}
 
         return fields;
     }
@@ -96,7 +107,7 @@ public class DBFMetadataReader {
      * @param fieldBytes
      * @return
      */
-    private static IDBFField readDbfField(byte[] fieldBytes) {
+    private static IDBFField readDbfField(byte[] fieldBytes, int fieldOffset) {
 
         String name;
         int length;
@@ -120,7 +131,7 @@ public class DBFMetadataReader {
         // 4. Set number of decimal places
         numberOfDecimalPlaces = fieldBytes[17];
 
-        return new DBFFieldImpl(name, type, length, numberOfDecimalPlaces);
+        return new DBFFieldImpl(name, type, length, numberOfDecimalPlaces, fieldOffset);
     }
 
     private static Date parseHeaderUpdateDate(byte yearByte, byte monthByte, byte dayByte, DbfFileTypeEnum fileType) {

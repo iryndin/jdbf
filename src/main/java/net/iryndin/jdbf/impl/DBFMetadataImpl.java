@@ -42,4 +42,20 @@ public class DBFMetadataImpl implements IDBFMetadata {
     public IDBFField getField(String name) {
         return fieldMap.get(name);
     }
+
+    private String fieldsToString() {
+        StringBuilder sb = new StringBuilder();
+        for (IDBFField f : fields) {
+            sb.append(f).append("\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "DBFMetadataImpl{" +
+                "header=" + header +
+                ", fields=\n" + fieldsToString() +
+                '}';
+    }
 }

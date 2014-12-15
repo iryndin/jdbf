@@ -55,6 +55,7 @@ public class DbfReader implements Closeable {
         byte[] bytes = new byte[16];
         // 2. Read 16 bytes
         dbfInputStream.read(bytes);
+        System.out.println("Header bytes: " + Arrays.toString(bytes));
         // 3. Fill header fields
         DbfMetadataUtils.fillHeaderFields(metadata, bytes);
         // 4. Read next 16 bytes (for most DBF types these are reserved bytes)
