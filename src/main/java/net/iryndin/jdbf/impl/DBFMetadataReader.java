@@ -40,7 +40,6 @@ public class DBFMetadataReader {
         if (bytesRead != 16) {
             throw new IOException("When reading DBF header should read exactly 16 bytes! Bytes read instead: " + bytesRead);
         }
-        System.out.println("Header bytes: " + Arrays.toString(headerBytes));
 
         DbfFileTypeEnum type = DbfFileTypeEnum.fromInt(headerBytes[0]);
         Date updateDate = parseHeaderUpdateDate(headerBytes[1], headerBytes[2], headerBytes[3], type);
@@ -67,7 +66,6 @@ public class DBFMetadataReader {
         int offset = 1;
         while (true) {
             inputStream.read(fieldBytes);
-            System.out.println(Arrays.toString(fieldBytes));
             IDBFField field = readDbfField(fieldBytes, offset);
             fields.add(field);
             offset += field.getLength();
@@ -88,12 +86,12 @@ public class DBFMetadataReader {
         headerLength += 32;
         headerLength += 1;
 
-        //if (headerLength != header.getFullHeaderLength()) {
-        //    throw new IllegalStateException("headerLength != header.getFullHeaderLength()");
-        //}
-        //if (fieldLength != header.getOneRecordLength()) {
-        //    throw new IllegalStateException("fieldLength != header.getOneRecordLength()");
-        //}
+        if (headerLength != header.getFullHeaderLength()) {
+            throw new IllegalStateException("headerLength != header.getFullHeaderLength()");
+        }
+        if (fieldLength != header.getOneRecordLength()) {
+            throw new IllegalStateException("fieldLength != header.getOneRecordLength()");
+        }
 
         return fields;
     }
