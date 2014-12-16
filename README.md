@@ -3,6 +3,12 @@ jdbf
 
 Java utility to read/write DBF files
 
+### Version 2.1.0
+
+Fix issue [#5](https://github.com/iryndin/jdbf/issues/5) - don't load DBF and MEMO files into memory when reading it (thanks to Eugene Michuk for noticing this!)
+
+Fix issue [#9](https://github.com/iryndin/jdbf/issues/9) - don't define some DBF file types correctly (thanks to [l1feh4ck3r](https://github.com/l1feh4ck3r)!!)
+
 ### Version 2.0.2
 
 Fix issue [#7](https://github.com/iryndin/jdbf/issues/7) - add DbfRecord.isDeleted() method that checks if record is deleted.

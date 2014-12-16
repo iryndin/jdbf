@@ -21,9 +21,10 @@ public enum DbfFileTypeEnum {
 		this.description = description;
 	}
 	
-	public static DbfFileTypeEnum fromInt(int type) {
+	public static DbfFileTypeEnum fromInt(byte bType) {
+        int iType = 0xFF & bType;
 		for (DbfFileTypeEnum e : DbfFileTypeEnum.values()) {
-			if (e.type == type) {
+			if (e.type == iType) {
 				return e;
 			}
 		}
