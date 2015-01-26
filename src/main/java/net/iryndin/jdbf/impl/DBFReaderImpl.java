@@ -21,21 +21,13 @@ public class DBFReaderImpl implements IDBFReader {
 
     public DBFReaderImpl(InputStream inputStream) throws IOException {
         this.inputStream = inputStream;
-        if (!inputStream.markSupported()) {
-            throw new IllegalArgumentException("InputStream should support marks! InputStream.markSupported() should return true!");
-        }
         this.metadata = readHeaderAndFields();
-        positionToFirstRecord();
-    }
-
-    private void positionToFirstRecord() throws IOException {
-        inputStream.skip(metadata.getHeader().getFullHeaderLength());
     }
 
     private IDBFMetadata readHeaderAndFields() throws IOException {
-        inputStream.mark(Integer.MAX_VALUE);
-        IDBFMetadata md  = new DBFMetadataReader(inputStream).readDbfMetadata();
-        inputStream.reset();
+        DBFMetadataReader metadataReader = new DBFMetadataReader(inputStream);
+        IDBFMetadata md  = metadataReader.readDbfMetadata();
+        inputStream.skip(md.getHeader().getFullHeaderLength() - metadataReader.getReadBytesCount());
         return md;
     }
 
@@ -86,12 +78,12 @@ public class DBFReaderImpl implements IDBFReader {
         public IDBFRecord next() {
             final int recordLength = metadata.getHeader().getOneRecordLength();
             byte[] recordBuffer = new byte[recordLength];
+            Arrays.fill(recordBuffer, (byte)0x0);
             try {
                 int bytesRead = inputStream.read(recordBuffer);
                 if (bytesRead != recordLength) {
                     throw new IllegalStateException("Read less bytes than record length! Bytes read: " + bytesRead +", record length: " + recordLength);
                 }
-                Arrays.fill(recordBuffer, (byte)0x0);
                 return new DBFRecordImpl(recordBuffer, currentRecordNumber++, metadata, charset);
             } catch (IOException e) {
                 throw new IllegalStateException(e);
@@ -102,5 +94,5 @@ public class DBFReaderImpl implements IDBFReader {
         public void remove() {
             throw new UnsupportedOperationException("remove is not supported!");
         }
-    };
+    }
 }

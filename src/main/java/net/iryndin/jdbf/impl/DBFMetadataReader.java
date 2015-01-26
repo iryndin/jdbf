@@ -10,7 +10,6 @@ import net.iryndin.jdbf.util.BitUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +22,7 @@ public class DBFMetadataReader {
     public static final int HEADER_TERMINATOR = 0x0D;
 
     private final InputStream inputStream;
+    private int readBytesCount = 0;
 
     public DBFMetadataReader(InputStream inputStream) {
         this.inputStream = inputStream;
@@ -40,6 +40,7 @@ public class DBFMetadataReader {
         if (bytesRead != 16) {
             throw new IOException("When reading DBF header should read exactly 16 bytes! Bytes read instead: " + bytesRead);
         }
+        readBytesCount += bytesRead;
 
         DbfFileTypeEnum type = DbfFileTypeEnum.fromInt(headerBytes[0]);
         Date updateDate = parseHeaderUpdateDate(headerBytes[1], headerBytes[2], headerBytes[3], type);
@@ -51,7 +52,7 @@ public class DBFMetadataReader {
         byte ecnryptionFlag = headerBytes[15];
 
         // Read next 16 bytes (for most DBF types these are reserved bytes)
-        inputStream.read(headerBytes);
+        readBytesCount += inputStream.read(headerBytes);
 
         return new DBFHeaderImpl(type, updateDate, recordsQty, fullHeaderLength, oneRecordLength, uncompletedTxFlag, ecnryptionFlag);
     }
@@ -64,8 +65,9 @@ public class DBFMetadataReader {
         // offset == 1
         // because first (zero-shifted) byte is record flag
         int offset = 1;
+        int fieldBytesOffset = 0;
         while (true) {
-            inputStream.read(fieldBytes);
+            readBytesCount += inputStream.read(fieldBytes, fieldBytesOffset, FIELD_RECORD_LENGTH-fieldBytesOffset);
             IDBFField field = readDbfField(fieldBytes, offset);
             fields.add(field);
             offset += field.getLength();
@@ -73,13 +75,13 @@ public class DBFMetadataReader {
             fieldLength += field.getLength();
             headerLength += fieldBytes.length;
 
-            long oldAvailable = inputStream.available();
             int terminator = inputStream.read();
+            readBytesCount+=1;
             if (terminator == HEADER_TERMINATOR) {
                 break;
             } else {
-                inputStream.reset();
-                inputStream.skip(inputStream.available() - oldAvailable);
+                fieldBytes[0] = (byte)terminator;
+                fieldBytesOffset=1;
             }
         }
         fieldLength += 1;
@@ -113,7 +115,7 @@ public class DBFMetadataReader {
 
         // 1. Set name
         {
-            int i = 0;
+            int i;
             for (i = 0; i < 11 && fieldBytes[i] > 0; i++) ;
             name = new String(fieldBytes, 0, i);
         }
@@ -142,5 +144,9 @@ public class DBFMetadataReader {
         int day = dayByte;
         return new Date(year,month,day);
 
+    }
+
+    public int getReadBytesCount() {
+        return readBytesCount;
     }
 }

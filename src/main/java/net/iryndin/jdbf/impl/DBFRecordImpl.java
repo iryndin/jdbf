@@ -3,7 +3,6 @@ package net.iryndin.jdbf.impl;
 import net.iryndin.jdbf.api.IDBFField;
 import net.iryndin.jdbf.api.IDBFMetadata;
 import net.iryndin.jdbf.api.IDBFRecord;
-import net.iryndin.jdbf.core.DbfField;
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -93,9 +92,9 @@ public class DBFRecordImpl implements IDBFRecord {
         IDBFField fieldMeta = getField(name);
         if (fieldMeta != null) {
             byte[] bytes = new byte[fieldMeta.getLength()];
-            System.arraycopy(bytes, fieldMeta.getOffset(), bytes, 0, fieldMeta.getLength());
+            System.arraycopy(recordBytes, fieldMeta.getOffset(), bytes, 0, fieldMeta.getLength());
 
-            int actualOffset = fieldMeta.getOffset();
+            int actualOffset = 0;
             int actualLength = fieldMeta.getLength();
 
             // check for empty strings
@@ -143,8 +142,12 @@ public class DBFRecordImpl implements IDBFRecord {
 
     @Override
     public BigDecimal getBigDecimal(String name) {
-        String str = getString(name).trim();
-        if (str != null && !str.isEmpty()) {
+        String str = getString(name);
+        if (str == null) {
+            return null;
+        }
+        str = str.trim();
+        if (!str.isEmpty()) {
             if (str.contains(NUMERIC_OVERFLOW)) {
                 return null;
             }
