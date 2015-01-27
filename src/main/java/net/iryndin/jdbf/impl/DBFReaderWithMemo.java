@@ -1,7 +1,7 @@
 package net.iryndin.jdbf.impl;
 
+import net.iryndin.jdbf.api.IDBFMemoReader;
 import net.iryndin.jdbf.api.IDBFMetadata;
-import net.iryndin.jdbf.api.IDBFReader;
 import net.iryndin.jdbf.api.IDBFRecord;
 
 import java.io.IOException;
@@ -10,61 +10,37 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Iterator;
 
-/**
- *
- */
-public class DBFReaderImpl implements IDBFReader {
+public class DBFReaderWithMemo extends DBFReaderImpl {
 
-    protected final InputStream inputStream;
-    protected final IDBFMetadata metadata;
-    protected Charset charset = Charset.defaultCharset();
+    private final IDBFMemoReader memoReader;
 
-    public DBFReaderImpl(InputStream inputStream) throws IOException {
-        this.inputStream = inputStream;
-        this.metadata = readHeaderAndFields();
-    }
-
-    private IDBFMetadata readHeaderAndFields() throws IOException {
-        DBFMetadataReader metadataReader = new DBFMetadataReader(inputStream);
-        IDBFMetadata md  = metadataReader.readDbfMetadata();
-        inputStream.skip(md.getHeader().getFullHeaderLength() - metadataReader.getReadBytesCount());
-        return md;
-    }
-
-    @Override
-    public Charset getCharset() {
-        return charset;
-    }
-
-    @Override
-    public void setCharset(Charset charset) {
-        this.charset = charset;
-    }
-
-    @Override
-    public IDBFMetadata getMetadata() {
-        return metadata;
+    public DBFReaderWithMemo(InputStream inputStream, InputStream memoStream) throws IOException {
+        super(inputStream);
+        this.memoReader = new DBFMemoReaderImpl(memoStream);
     }
 
     @Override
     public void close() throws IOException {
-        inputStream.close();
+        memoReader.close();
+        super.close();
     }
 
     @Override
     public Iterator<IDBFRecord> iterator() {
-        return new DBFRecordIterator(inputStream, metadata, charset);
+        return new DBFRecordIteratorWithMemo(inputStream, memoReader, metadata, charset);
     }
 
-    private static class DBFRecordIterator implements Iterator<IDBFRecord> {
+    private static class DBFRecordIteratorWithMemo implements Iterator<IDBFRecord> {
 
         private final InputStream inputStream;
+        private final IDBFMemoReader memoReader;
         private final IDBFMetadata metadata;
         private final Charset charset;
         private int currentRecordNumber = 0;
 
-        private DBFRecordIterator(InputStream inputStream, IDBFMetadata metadata, Charset charset) {
+        private DBFRecordIteratorWithMemo(InputStream inputStream, IDBFMemoReader memoReader, IDBFMetadata metadata, Charset charset) {
             this.inputStream = inputStream;
+            this.memoReader = memoReader;
             this.metadata = metadata;
             this.charset = charset;
         }
@@ -84,7 +60,7 @@ public class DBFReaderImpl implements IDBFReader {
                 if (bytesRead != recordLength) {
                     throw new IllegalStateException("Read less bytes than record length! Bytes read: " + bytesRead +", record length: " + recordLength);
                 }
-                return new DBFRecordImpl(recordBuffer, currentRecordNumber++, metadata, charset);
+                return new DBFRecordWithMemo(recordBuffer, currentRecordNumber++, metadata, charset, memoReader);
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }

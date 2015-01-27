@@ -4,6 +4,7 @@ import net.iryndin.jdbf.api.IDBFField;
 import net.iryndin.jdbf.api.IDBFMetadata;
 import net.iryndin.jdbf.api.IDBFRecord;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.text.ParseException;
@@ -22,7 +23,7 @@ public class DBFRecordImpl implements IDBFRecord {
 
     public final static String NUMERIC_OVERFLOW = "*";
 
-    private final byte[] recordBytes;
+    protected final byte[] recordBytes;
     private final int recordNumber;
     private final IDBFMetadata metadata;
     private Charset charset;
@@ -72,7 +73,7 @@ public class DBFRecordImpl implements IDBFRecord {
     }
 
     @Override
-    public byte[] getBytes(String name) {
+    public byte[] getBytes(String name) throws IOException {
         byte[] bytes = null;
         IDBFField fieldMeta = getField(name);
         if (fieldMeta != null) {
@@ -169,7 +170,7 @@ public class DBFRecordImpl implements IDBFRecord {
     }
 
     @Override
-    public Map<String, Object> toMap() {
+    public Map<String, Object> toMap() throws IOException {
         Map<String, Object> map = new LinkedHashMap<>();
         for (IDBFField field : getFields()) {
             switch (field.getType()) {

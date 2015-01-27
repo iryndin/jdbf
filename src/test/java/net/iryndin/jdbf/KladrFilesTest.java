@@ -10,9 +10,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 
-/**
- * Created by iryndin on 26.01.15.
- */
 public class KladrFilesTest {
 
     static final String PATH = "/var/jdbf/temp";
@@ -30,12 +27,13 @@ public class KladrFilesTest {
         } else {
             System.out.println("Found STREET.DBF");
         }
-        IDBFReader reader = JDBF.createDBFReader(file);
-        System.out.println(reader.getMetadata());
-        System.out.println("=================================================");
-        reader.setCharset(Charset.forName("cp866"));
-        for (IDBFRecord rec : reader) {
-            System.out.println(rec.getRecordNumber()+": " + rec.getString("NAME"));
+        try (IDBFReader reader = JDBF.createDBFReader(file)) {
+            System.out.println(reader.getMetadata());
+            System.out.println("=================================================");
+            reader.setCharset(Charset.forName("cp866"));
+            for (IDBFRecord rec : reader) {
+                System.out.println(rec.getRecordNumber() + ": " + rec.getString("NAME"));
+            }
         }
     }
 
@@ -52,12 +50,12 @@ public class KladrFilesTest {
         } else {
             System.out.println("Found ALTNAMES.DBF");
         }
-        IDBFReader reader = JDBF.createDBFReader(file);
-        System.out.println(reader.getMetadata());
-        System.out.println("=================================================");
-        for (IDBFRecord rec : reader) {
-            System.out.println(rec.getRecordNumber()+": " + rec.getString("OLDCODE") + " --> " + rec.getString("NEWCODE")+", L: " + rec.getString("LEVEL"));
+        try (IDBFReader reader = JDBF.createDBFReader(file)) {
+            System.out.println(reader.getMetadata());
+            System.out.println("=================================================");
+            for (IDBFRecord rec : reader) {
+                System.out.println(rec.getRecordNumber()+": " + rec.getString("OLDCODE") + " --> " + rec.getString("NEWCODE")+", L: " + rec.getString("LEVEL"));
+            }
         }
     }
-
 }

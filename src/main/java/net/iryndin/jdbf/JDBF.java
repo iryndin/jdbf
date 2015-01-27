@@ -41,4 +41,40 @@ public class JDBF {
     public static IDBFReader createDBFReader(String path) throws IOException {
         return createDBFReader(new File(path));
     }
+
+    /**
+     * Factory method that creates IDBFReader
+     *
+     * @param dbfStream InputStream that holds DBF file
+     * @param memoStream InputStream that holds memo file
+     * @return IDBFReader implementation
+     * @throws IOException if IO errors occur
+     */
+    public static IDBFReader createDBFReader(InputStream dbfStream, InputStream memoStream) throws IOException {
+        return new DBFReaderImpl(dbfStream);
+    }
+
+    /**
+     * Factory method that creates IDBFReader
+     *
+     * @param dbfFile DBF file
+     * @param memoFile DBF file
+     * @return IDBFReader implementation
+     * @throws IOException if IO errors occur
+     */
+    public static IDBFReader createDBFReader(File dbfFile, File memoFile) throws IOException {
+        return createDBFReader(new FileInputStream(dbfFile), new FileInputStream(memoFile));
+    }
+
+    /**
+     * Factory method that creates IDBFReader
+     *
+     * @param dbfPath path to DBF file
+     * @param memoPath path to DBF file
+     * @return IDBFReader implementation
+     * @throws IOException if IO errors occur
+     */
+    public static IDBFReader createDBFReader(String dbfPath, String memoPath) throws IOException {
+        return createDBFReader(new File(dbfPath), new File(memoPath));
+    }
 }

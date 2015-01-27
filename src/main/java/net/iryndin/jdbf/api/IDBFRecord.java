@@ -1,5 +1,6 @@
 package net.iryndin.jdbf.api;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -16,7 +17,7 @@ public interface IDBFRecord {
     boolean isDeleted();
     Collection<IDBFField> getFields();
     IDBFField getField(String name);
-    byte[] getBytes(String name);
+    byte[] getBytes(String name) throws IOException;
     String getString(String name);
     String getString(String name, Charset charset);
     Date getDate(String name);
@@ -24,5 +25,5 @@ public interface IDBFRecord {
     Integer getInt(String name);
     BigDecimal getBigDecimal(String name);
     Boolean getBoolean(String name);
-    Map<String, Object> toMap();
+    Map<String, Object> toMap() throws IOException;
 }
