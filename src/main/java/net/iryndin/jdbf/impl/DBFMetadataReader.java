@@ -88,9 +88,9 @@ public class DBFMetadataReader {
         headerLength += 32;
         headerLength += 1;
 
-        if (headerLength != header.getFullHeaderLength()) {
-            throw new IllegalStateException("headerLength != header.getFullHeaderLength()");
-        }
+        //if (headerLength != header.getFullHeaderLength()) {
+        //    throw new IllegalStateException("headerLength != header.getFullHeaderLength()");
+        //}
         if (fieldLength != header.getOneRecordLength()) {
             throw new IllegalStateException("fieldLength != header.getOneRecordLength()");
         }

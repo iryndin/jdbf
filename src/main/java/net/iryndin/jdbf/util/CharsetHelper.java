@@ -19,7 +19,7 @@ public class CharsetHelper {
         switch (b) {
             case 0x01: return Charset.forName("437"); // U.S. MS-DOS
             case 0x02: return Charset.forName("850"); // International MS-DOS
-            case 0x03: return Charset.forName("1252"); // Windows ANSI
+            case 0x03: return Charset.forName("windows-1252"); // Windows ANSI
             case 0x04: return Charset.forName("10000"); // Standard Macintosh
             case 0x64: return Charset.forName("852"); // Eastern European MS-DOS
             case 0x65: return Charset.forName("866"); // Russian MS-DOS

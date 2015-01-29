@@ -2,6 +2,7 @@ package net.iryndin.jdbf;
 
 import net.iryndin.jdbf.api.IDBFReader;
 import net.iryndin.jdbf.impl.DBFReaderImpl;
+import net.iryndin.jdbf.impl.DBFReaderWithMemo;
 
 import java.io.*;
 
@@ -51,7 +52,7 @@ public class JDBF {
      * @throws IOException if IO errors occur
      */
     public static IDBFReader createDBFReader(InputStream dbfStream, InputStream memoStream) throws IOException {
-        return new DBFReaderImpl(dbfStream);
+        return new DBFReaderWithMemo(dbfStream, memoStream);
     }
 
     /**
