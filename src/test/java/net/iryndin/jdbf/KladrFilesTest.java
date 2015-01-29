@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 
 public class KladrFilesTest {
 
-    static final String PATH = "/var/jdbf/temp";
+    public static final String PATH = "/var/jdbf/temp";
 
     @Test
     public void streetDbf() throws IOException {
