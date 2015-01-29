@@ -2,6 +2,7 @@ package net.iryndin.jdbf.api;
 
 import net.iryndin.jdbf.core.DbfFileTypeEnum;
 
+import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
@@ -15,4 +16,5 @@ public interface IDBFHeader {
     int getOneRecordLength();
     byte getUncompletedTxFlag();
     byte getEcnryptionFlag();
+    Charset getCharset();
 }

@@ -3,6 +3,7 @@ package net.iryndin.jdbf.impl;
 import net.iryndin.jdbf.api.IDBFHeader;
 import net.iryndin.jdbf.core.DbfFileTypeEnum;
 
+import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
@@ -17,8 +18,9 @@ public class DBFHeaderImpl implements IDBFHeader {
     private final int oneRecordLength;
     private final byte uncompletedTxFlag;
     private final byte ecnryptionFlag;
+    private final Charset charset;
 
-    public DBFHeaderImpl(DbfFileTypeEnum type, Date updateDate, int recordsQty, int fullHeaderLength, int oneRecordLength, byte uncompletedTxFlag, byte ecnryptionFlag) {
+    public DBFHeaderImpl(DbfFileTypeEnum type, Date updateDate, int recordsQty, int fullHeaderLength, int oneRecordLength, byte uncompletedTxFlag, byte ecnryptionFlag, Charset charset) {
         this.type = type;
         this.updateDate = updateDate;
         this.recordsQty = recordsQty;
@@ -26,6 +28,7 @@ public class DBFHeaderImpl implements IDBFHeader {
         this.oneRecordLength = oneRecordLength;
         this.uncompletedTxFlag = uncompletedTxFlag;
         this.ecnryptionFlag = ecnryptionFlag;
+        this.charset = charset;
     }
 
     @Override
@@ -64,6 +67,11 @@ public class DBFHeaderImpl implements IDBFHeader {
     }
 
     @Override
+    public Charset getCharset() {
+        return charset;
+    }
+
+    @Override
     public String toString() {
         return "DBFHeaderImpl{" +
                 "type=" + type +
@@ -73,6 +81,7 @@ public class DBFHeaderImpl implements IDBFHeader {
                 ", oneRecordLength=" + oneRecordLength +
                 ", uncompletedTxFlag=" + uncompletedTxFlag +
                 ", ecnryptionFlag=" + ecnryptionFlag +
+                ", charset=" + charset +
                 '}';
     }
 }

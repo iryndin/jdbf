@@ -22,6 +22,9 @@ public class DBFReaderImpl implements IDBFReader {
     public DBFReaderImpl(InputStream inputStream) throws IOException {
         this.inputStream = inputStream;
         this.metadata = readHeaderAndFields();
+        if (this.metadata.getHeader().getCharset() != null) {
+            this.charset = this.metadata.getHeader().getCharset();
+        }
     }
 
     private IDBFMetadata readHeaderAndFields() throws IOException {

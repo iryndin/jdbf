@@ -6,9 +6,11 @@ import net.iryndin.jdbf.api.IDBFMetadata;
 import net.iryndin.jdbf.core.DbfFieldTypeEnum;
 import net.iryndin.jdbf.core.DbfFileTypeEnum;
 import net.iryndin.jdbf.util.BitUtils;
+import net.iryndin.jdbf.util.CharsetHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,10 +37,10 @@ public class DBFMetadataReader {
     }
 
     public IDBFHeader readHeader() throws IOException {
-        byte[] headerBytes = new byte[16];
+        byte[] headerBytes = new byte[32];
         int bytesRead = inputStream.read(headerBytes);
-        if (bytesRead != 16) {
-            throw new IOException("When reading DBF header should read exactly 16 bytes! Bytes read instead: " + bytesRead);
+        if (bytesRead != 32) {
+            throw new IOException("When reading DBF header should read exactly 32 bytes! Bytes read instead: " + bytesRead);
         }
         readBytesCount += bytesRead;
 
@@ -50,11 +52,9 @@ public class DBFMetadataReader {
         int oneRecordLength = BitUtils.makeInt(headerBytes[10], headerBytes[11]);
         byte uncompletedTxFlag = headerBytes[14];
         byte ecnryptionFlag = headerBytes[15];
+        Charset charset = CharsetHelper.getCharsetByByte(headerBytes[29]);
 
-        // Read next 16 bytes (for most DBF types these are reserved bytes)
-        readBytesCount += inputStream.read(headerBytes);
-
-        return new DBFHeaderImpl(type, updateDate, recordsQty, fullHeaderLength, oneRecordLength, uncompletedTxFlag, ecnryptionFlag);
+        return new DBFHeaderImpl(type, updateDate, recordsQty, fullHeaderLength, oneRecordLength, uncompletedTxFlag, ecnryptionFlag, charset);
     }
 
     public List<IDBFField> readFields(IDBFHeader header) throws IOException {
