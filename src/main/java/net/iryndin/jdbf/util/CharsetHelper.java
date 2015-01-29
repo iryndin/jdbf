@@ -12,6 +12,10 @@ public class CharsetHelper {
      * byte 29 (0x1D) is code page mark
      * See
      * https://msdn.microsoft.com/en-us/library/aa975345(v=vs.71).aspx
+     *
+     * See supported encodings in Java
+     * http://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html
+     *
      * @param b
      * @return
      */
