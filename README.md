@@ -1,6 +1,8 @@
 jdbf
 ====
 
+[![Join the chat at https://gitter.im/iryndin/jdbf](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/iryndin/jdbf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Java utility to read/write DBF files
 
 ### Version 2.1.0
