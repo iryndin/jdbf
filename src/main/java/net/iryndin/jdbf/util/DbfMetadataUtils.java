@@ -143,6 +143,11 @@ public class DbfMetadataUtils {
         }
         System.arraycopy(nameBytes, 0, fieldBytes, 0, nameBytes.length);
         fieldBytes[11] = field.getType().toByte();
+        byte[] b = BitUtils.makeByte4(field.getOffset());
+        fieldBytes[12] = b[0];
+        fieldBytes[13] = b[1];
+        fieldBytes[14] = b[2];
+        fieldBytes[15] = b[3];
         int length = field.getLength();
         fieldBytes[16] = (byte) (length & 0xff);
         fieldBytes[17] = (byte) (field.getNumberOfDecimalPlaces() & 0xff);
