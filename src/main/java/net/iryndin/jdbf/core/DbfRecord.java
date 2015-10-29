@@ -133,9 +133,15 @@ public class DbfRecord {
         if (f.getType() != DbfFieldTypeEnum.Memo) {
             throw new IllegalArgumentException("Field '" + fieldName + "' is not MEMO field!");
         }
-        byte[] dbfFieldBytes = new byte[f.getLength()];
-        System.arraycopy(bytes, f.getOffset(), dbfFieldBytes, 0, f.getLength());
-        int offsetInBlocks = BitUtils.makeInt(dbfFieldBytes[0],dbfFieldBytes[1],dbfFieldBytes[2],dbfFieldBytes[3]);
+        int offsetInBlocks = 0;
+        if (f.getLength() == 10) {
+            offsetInBlocks = getBigDecimal(fieldName).intValueExact();
+        } else {
+            byte[] dbfFieldBytes = new byte[f.getLength()];
+            System.arraycopy(bytes, f.getOffset(), dbfFieldBytes, 0, f.getLength());
+            offsetInBlocks = BitUtils.makeInt(dbfFieldBytes[0],dbfFieldBytes[1],dbfFieldBytes[2],dbfFieldBytes[3]);
+        }
+        if (offsetInBlocks == 0) return new byte[0];
         return memoReader.read(offsetInBlocks).getValue();
     }
 
@@ -144,9 +150,15 @@ public class DbfRecord {
         if (f.getType() != DbfFieldTypeEnum.Memo) {
             throw new IllegalArgumentException("Field '" + fieldName + "' is not MEMO field!");
         }
-        byte[] dbfFieldBytes = new byte[f.getLength()];
-        System.arraycopy(bytes, f.getOffset(), dbfFieldBytes, 0, f.getLength());
-        int offsetInBlocks = BitUtils.makeInt(dbfFieldBytes[0],dbfFieldBytes[1],dbfFieldBytes[2],dbfFieldBytes[3]);
+        int offsetInBlocks = 0;
+        if (f.getLength() == 10) {
+            offsetInBlocks = getBigDecimal(fieldName).intValueExact();
+        } else {
+            byte[] dbfFieldBytes = new byte[f.getLength()];
+            System.arraycopy(bytes, f.getOffset(), dbfFieldBytes, 0, f.getLength());
+            offsetInBlocks = BitUtils.makeInt(dbfFieldBytes[0],dbfFieldBytes[1],dbfFieldBytes[2],dbfFieldBytes[3]);
+        }
+        if (offsetInBlocks == 0) return "";
         return memoReader.read(offsetInBlocks).getValueAsString(charset);
     }
 
