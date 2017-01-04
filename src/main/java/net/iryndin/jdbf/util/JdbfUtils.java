@@ -1,5 +1,6 @@
 package net.iryndin.jdbf.util;
 
+import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -104,5 +105,32 @@ public class JdbfUtils {
 				return o1.equals(o2);
 			}
 		}
+	}
+
+	public static byte[] writeJulianDate(Date d) {
+		ByteBuffer bb = ByteBuffer.allocate(8);
+
+		bb.putInt(0, julianDay(d));
+		bb.putInt(4, d.getHours() * 60 * 60 * 1000 + d.getMinutes() * 60 * 1000 + d.getSeconds() * 1000);
+
+		return bb.array();
+	}
+
+	private static int julianDay(Date d) {
+		int year = d.getYear();
+		int month = d.getMonth()+1;
+		int day = d.getDate();
+
+		double extra = (100.0 * year) + month - 190002.5;
+		long l = (long)((367.0 * year) -
+				(Math.floor(7.0 * (year + Math.floor((month + 9.0) / 12.0)) / 4.0)) +
+				Math.floor((275.0 * month) / 9.0) +
+				day);
+
+		// Unsigned types are too complicated they said... Only having signed ones makes it easier they said
+		if (l > Integer.MAX_VALUE)
+			return ~((int)l & Integer.MAX_VALUE);
+		else
+			return (int)(l & Integer.MAX_VALUE);
 	}
 }
