@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
@@ -19,14 +20,14 @@ public class DbfWriter {
 	private DbfMetadata metadata;
 	private Charset stringCharset = Charset.defaultCharset();
 	private byte[] recordBuffer;
- 
+
 	public DbfWriter(DbfMetadata metadata,OutputStream out) throws IOException {
 		this.out = out;
 		this.metadata = metadata;
 		recordBuffer = new byte[metadata.getOneRecordLength()];
 		writeHeaderAndFields();
 	}
-	
+
 	private void writeHeaderAndFields() throws IOException {
 		writeHeader();
 		writeFields();
@@ -37,9 +38,9 @@ public class DbfWriter {
 		// assert(bytes.length == 16);
 		out.write(bytes);
 		BitUtils.memset(bytes, 0);
-		out.write(bytes);		
+		out.write(bytes);
 	}
-	
+
 	private void writeFields() throws IOException {
 		byte[] bytes = new byte[JdbfUtils.FIELD_RECORD_LENGTH];
 		for (DbfField f : metadata.getFields()) {
@@ -48,12 +49,12 @@ public class DbfWriter {
 		}
 		out.write(JdbfUtils.HEADER_TERMINATOR);
 	}
-	
+
 	public void write(Map<String, Object> map) throws IOException {
 		BitUtils.memset(recordBuffer, JdbfUtils.EMPTY);
 		for (DbfField f : metadata.getFields()) {
 			Object o = map.get(f.getName());
-			writeIntoRecordBuffer(f, o);			
+			writeIntoRecordBuffer(f, o);
 		}
 		out.write(recordBuffer);
 	}
@@ -109,38 +110,56 @@ public class DbfWriter {
 			throw new UnsupportedOperationException("Unknown or unsupported field type " + f.getType().name() + " for " + f.getName());
 		}
 	}
-	
+
 	private void writeBigDecimal(DbfField f, BigDecimal value) {
-		String s = value.toPlainString();
-		byte[] bytes = s.getBytes();
-		if (bytes.length > f.getLength()) {
-			byte[] newBytes = new byte[f.getLength()];
-			System.arraycopy(bytes, 0, newBytes, 0, f.getLength());
-			bytes = newBytes;
+		if (value != null) {
+			String s = value.toPlainString();
+			byte[] bytes = s.getBytes();
+			if (bytes.length > f.getLength()) {
+				byte[] newBytes = new byte[f.getLength()];
+				System.arraycopy(bytes, 0, newBytes, 0, f.getLength());
+				bytes = newBytes;
+			}
+			System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
+		} else {
+			blankify(f);
 		}
-		System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
 	}
 
 	private void writeBoolean(DbfField f, Boolean value) {
-		String s = value.booleanValue() ? "T" : "F";
-		byte[] bytes = s.getBytes();
-		System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);		
+		if (value != null) {
+			String s = value.booleanValue() ? "T" : "F";
+			byte[] bytes = s.getBytes();
+			System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
+		} else {
+			// dBASE 7 explicitly requires ? for uninitialized, some systems may use ' ' as well
+			byte[] bytes = "?".getBytes();
+			System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
+		}
 	}
 
 	private void writeDate(DbfField f, Date value) {
-		byte[] bytes = JdbfUtils.writeDate(value);
-		// TODO: check that bytes.length = f.getLength();
-		System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
+		if (value != null) {
+			byte[] bytes = JdbfUtils.writeDate(value);
+			// TODO: check that bytes.length = f.getLength();
+			System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
+		} else {
+			blankify(f);
+		}
 	}
 
 	private void writeString(DbfField f, String value) {
-		byte[] bytes = value.getBytes(stringCharset);
-		if (bytes.length > f.getLength()) {
-			byte[] newBytes = new byte[f.getLength()];
-			System.arraycopy(bytes, 0, newBytes, 0, f.getLength());
-			bytes = newBytes;
+		if (value != null) {
+			byte[] bytes = value.getBytes(stringCharset);
+			if (bytes.length > f.getLength()) {
+				byte[] newBytes = new byte[f.getLength()];
+				System.arraycopy(bytes, 0, newBytes, 0, f.getLength());
+				bytes = newBytes;
+			}
+			System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
+		} else {
+			blankify(f);
 		}
-		System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
 	}
 
 	private void writeFloat(DbfField f, Float value) {
@@ -148,42 +167,68 @@ public class DbfWriter {
 	}
 
 	private void writeDouble(DbfField f, Double value) {
-		String str = String.format("% 20.18f", value); // Whitespace pad; 20 min length; 18 max precision
-		if (str.length() > 20) { // Trim to 20 places, if longer
-			str = str.substring(0, 20);
+		if (value != null) {
+			String str = String.format("% 20.18f", value); // Whitespace pad; 20 min length; 18 max precision
+			if (str.length() > 20) { // Trim to 20 places, if longer
+				str = str.substring(0, 20);
+			}
+			writeString(f, str);
+		} else {
+			blankify(f);
 		}
-		writeString(f, str);
 	}
 
 	private void writeTimestamp(DbfField f, Date d) {
-		byte[] bytes = JdbfUtils.writeJulianDate(d);
-		System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
+		if (d != null) {
+			byte[] bytes = JdbfUtils.writeJulianDate(d);
+			System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
+		} else {
+			blankify(f);
+		}
 	}
 
 	// TODO: Appears to be 64 bit epoch timestamp, but there was no reliable source for that
 	private void writeDateTime(DbfField f, Date d) {
-		ByteBuffer bb = ByteBuffer.allocate(8);
-		bb.putLong(d.getTime());
-		System.arraycopy(bb.array(), 0, recordBuffer, f.getOffset(), bb.capacity());
+		if (d != null) {
+			ByteBuffer bb = ByteBuffer.allocate(8);
+			bb.putLong(d.getTime());
+			System.arraycopy(bb.array(), 0, recordBuffer, f.getOffset(), bb.capacity());
+		} else {
+			blankify(f);
+		}
 	}
 
 	private void writeDouble7(DbfField f, Double d) {
-		ByteBuffer bb = ByteBuffer.allocate(8);
-		bb.putDouble(d);
-		System.arraycopy(bb.array(), 0, recordBuffer, f.getOffset(), bb.capacity());
+		if (d != null) {
+			ByteBuffer bb = ByteBuffer.allocate(8);
+			bb.putDouble(d);
+			System.arraycopy(bb.array(), 0, recordBuffer, f.getOffset(), bb.capacity());
+		} else {
+			blankify(f);
+		}
 	}
 
 	private void writeInteger(DbfField f, Integer i) {
-		ByteBuffer bb = ByteBuffer.allocate(4);
-		bb.putInt(i);
-		System.arraycopy(bb.array(), 0, recordBuffer, f.getOffset(), bb.capacity());
+		if (i != null) {
+			ByteBuffer bb = ByteBuffer.allocate(4);
+			bb.putInt(i);
+			System.arraycopy(bb.array(), 0, recordBuffer, f.getOffset(), bb.capacity());
+		} else {
+			blankify(f);
+		}
+	}
+
+	private void blankify(DbfField f) {
+		byte[] bytes = new byte[f.getLength()];
+		Arrays.fill(bytes, (byte)' ');
+		System.arraycopy(bytes, 0, recordBuffer, f.getOffset(), bytes.length);
 	}
 
 	public void close() throws IOException {
 		this.out.flush();
 		this.out.close();
 	}
-	
+
 	public void setStringCharset(String charsetName) {
 		setStringCharset(Charset.forName(charsetName));
 	}
