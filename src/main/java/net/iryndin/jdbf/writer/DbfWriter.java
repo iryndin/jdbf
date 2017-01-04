@@ -91,6 +91,7 @@ public class DbfWriter {
 			break;
 		case Double: // Behaves like dBASE 7 double but uses different column type identifier
 			writeDouble7(f, (Double)o);
+			break;
 		/*case Integer: // exactly like dBASE 7
 			writeInteger(f, (Integer)o);
 			break;*/
