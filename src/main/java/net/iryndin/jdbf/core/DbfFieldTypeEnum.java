@@ -6,8 +6,18 @@ public enum DbfFieldTypeEnum {
     Numeric('N'),
     Float('F'),
     Date('D'),
+    /**
+     * @deprecated FoxPro-specific extension. Use Timestamp/@ with dBASE 7 or later
+     */
+    @Deprecated
     DateTime('T'),
+    Timestamp('@'), // dbASE 7 julain date
+    /**
+     * @deprecated Binary doubles are FoxPro specific dBASE V uses B for binary MEMOs. Use Double7, Float or Numeric instead
+     */
+    @Deprecated
     Double('B'),
+    Double7('O'), // dBASE 7 binary double (standardized in contrast to 'B'
     Integer('I'),
     Logical('L'),
     Memo('M'),

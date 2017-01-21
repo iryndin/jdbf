@@ -31,6 +31,21 @@ public class DbfMetadataUtils {
         return metadata;
     }
 
+    public static DbfMetadata fromFields(List<DbfField> fields, DbfFileTypeEnum fileType) {
+        DbfMetadata metadata = new DbfMetadata();
+
+        metadata.setType(fileType);
+        metadata.setUpdateDate(new Date());
+        int fullHeaderLength = calculateFullHeaderLength(fields);
+        metadata.setFullHeaderLength(fullHeaderLength);
+        int oneRecordLength = calculateOneRecordLength(fields);
+        metadata.setOneRecordLength(oneRecordLength);
+
+        metadata.setFields(fields);
+
+        return metadata;
+    }
+
     public static int calculateOneRecordLength(List<DbfField> fields) {
         int result = 0;
         for (DbfField field : fields) {

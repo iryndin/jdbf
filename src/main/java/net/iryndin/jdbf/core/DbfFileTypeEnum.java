@@ -11,7 +11,11 @@ public enum DbfFileTypeEnum {
 	dBASEIV3(0x8B,"dBASE IV with memo"),
 	dBASEIV4(0xCB,"dBASE IV SQL table files, with memo"),
 	FoxPro2x(0xF5,"FoxPro 2.x (or earlier) with memo"),
-	FoxBASE2(0xFB,"FoxBASE");
+	FoxBASE2(0xFB,"FoxBASE"),
+	dBASEVII1(0x44,"dBASE VII SQL table files, no memo"),
+	dBASEVII2(0x64,"dBASE VII SQL system files, no memo"),
+	dBASEIVII3(0x8D,"dBASE VII with memo"),
+	dBASEIVII4(0xCD,"dBASE VII SQL table files, with memo"),;
 	
 	final int type;
 	final String description;
