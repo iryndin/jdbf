@@ -9,7 +9,8 @@ import java.util.Arrays;
 
 public class DbfReader implements Closeable {
 
-    private InputStream dbfInputStream;
+    private static final int HEADER_HALF_SIZE = 16;
+	private InputStream dbfInputStream;
     private MemoReader memoReader;
     private DbfMetadata metadata;
     private byte[] oneRecordBuffer;
@@ -52,13 +53,16 @@ public class DbfReader implements Closeable {
 
     private void readHeader() throws IOException {
         // 1. Allocate buffer
-        byte[] bytes = new byte[16];
+        byte[] bytes = new byte[HEADER_HALF_SIZE];
         // 2. Read 16 bytes
-        dbfInputStream.read(bytes);
+        if (dbfInputStream.read(bytes) != HEADER_HALF_SIZE)
+        	throw new IOException("The file is corrupted or is not a dbf file");
+        	
         // 3. Fill header fields
         DbfMetadataUtils.fillHeaderFields(metadata, bytes);
         // 4. Read next 16 bytes (for most DBF types these are reserved bytes)
-        dbfInputStream.read(bytes);
+        if (dbfInputStream.read(bytes) != HEADER_HALF_SIZE)
+        	throw new IOException("The file is corrupted or is not a dbf file");
     }
 
     @Override

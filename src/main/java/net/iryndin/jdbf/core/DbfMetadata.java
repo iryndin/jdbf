@@ -1,5 +1,6 @@
 package net.iryndin.jdbf.core;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -21,7 +22,9 @@ public class DbfMetadata {
 	public DbfFileTypeEnum getType() {
 		return type;
 	}
-	public void setType(DbfFileTypeEnum type) {
+	public void setType(DbfFileTypeEnum type) throws IOException {
+		if (type == null)
+			throw new IOException("The file is corrupted or is not a dbf file");
 		this.type = type;
 	}
 	public Date getUpdateDate() {

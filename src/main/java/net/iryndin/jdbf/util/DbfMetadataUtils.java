@@ -13,7 +13,7 @@ import java.util.List;
 
 public class DbfMetadataUtils {
 
-    public static DbfMetadata fromFieldsString(String s) {
+    public static DbfMetadata fromFieldsString(String s) throws IOException {
         List<DbfField> fields = JdbfUtils.createFieldsFromString(s);
 
         DbfMetadata metadata = new DbfMetadata();
@@ -51,7 +51,7 @@ public class DbfMetadataUtils {
 //		
 //	}
 
-    public static void fillHeaderFields(DbfMetadata metadata, byte[] headerBytes) {
+    public static void fillHeaderFields(DbfMetadata metadata, byte[] headerBytes) throws IOException {
         metadata.setType(DbfFileTypeEnum.fromInt(headerBytes[0]));
         metadata.setUpdateDate(parseHeaderUpdateDate(headerBytes[1], headerBytes[2], headerBytes[3], metadata.getType()));
         metadata.setRecordsQty(BitUtils.makeInt(headerBytes[4], headerBytes[5], headerBytes[6], headerBytes[7]));
@@ -80,7 +80,9 @@ public class DbfMetadataUtils {
         int headerLength = 0;
         int fieldLength = 0;
         while (true) {
-            inputStream.read(fieldBytes);
+            if (inputStream.read(fieldBytes) != JdbfUtils.FIELD_RECORD_LENGTH)
+            	throw new IOException("The file is corrupted or is not a dbf file");
+            	
             DbfField field = createDbfField(fieldBytes);
             fields.add(field);
 
@@ -89,7 +91,9 @@ public class DbfMetadataUtils {
 
             long oldAvailable = inputStream.available();
             int terminator = inputStream.read();
-            if (terminator == JdbfUtils.HEADER_TERMINATOR) {
+            if (terminator == -1) {
+            	throw new IOException("The file is corrupted or is not a dbf file");
+            } else if (terminator == JdbfUtils.HEADER_TERMINATOR) {
                 break;
             } else {
                 inputStream.reset();
