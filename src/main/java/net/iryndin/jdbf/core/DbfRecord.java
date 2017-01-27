@@ -230,7 +230,7 @@ public class DbfRecord {
         System.arraycopy(fieldBytes, 0, bytes, f.getOffset(), f.getLength());
     }
 
-    private Integer getInteger(String fieldName) {
+    public Integer getInteger(String fieldName) {
         byte[] bytes = getBytes(fieldName);
 
         return BitUtils.makeInt(bytes[0], bytes[1], bytes[2], bytes[3]);
