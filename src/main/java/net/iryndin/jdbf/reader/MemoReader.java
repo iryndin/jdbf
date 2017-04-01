@@ -37,7 +37,10 @@ public class MemoReader implements Closeable {
     private void readMetadata() throws IOException {
         byte[] headerBytes = new byte[JdbfUtils.MEMO_HEADER_LENGTH];
         memoInputStream.mark(8192);
-        memoInputStream.read(headerBytes);
+
+        if (IOUtils.readFully(memoInputStream, headerBytes) != JdbfUtils.MEMO_HEADER_LENGTH)
+            throw new IOException("The file is corrupted or is not a dbf file");
+
         this.memoHeader = MemoFileHeader.create(headerBytes);
     }
 
@@ -55,11 +58,15 @@ public class MemoReader implements Closeable {
     public MemoRecord read(int offsetInBlocks) throws IOException {
         memoInputStream.reset();
         memoInputStream.skip(memoHeader.getBlockSize()*offsetInBlocks);
-        byte[] recordHeader = new byte[8];
-        memoInputStream.read(recordHeader);
+        byte[] recordHeader = new byte[JdbfUtils.RECORD_HEADER_LENGTH];
+        if (IOUtils.readFully(memoInputStream, recordHeader) != JdbfUtils.RECORD_HEADER_LENGTH)
+            throw new IOException("The file is corrupted or is not a dbf file");
+
         int memoRecordLength = BitUtils.makeInt(recordHeader[7], recordHeader[6], recordHeader[5], recordHeader[4]);
         byte[] recordBody = new byte[memoRecordLength];
-        memoInputStream.read(recordBody);
+
+        if (IOUtils.readFully(memoInputStream, recordBody) != memoRecordLength)
+            throw new IOException("The file is corrupted or is not a dbf file");
 
         return new MemoRecord(recordHeader, recordBody, memoHeader.getBlockSize(), offsetInBlocks);
     }
