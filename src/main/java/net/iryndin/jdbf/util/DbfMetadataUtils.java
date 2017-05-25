@@ -31,7 +31,7 @@ public class DbfMetadataUtils {
         return metadata;
     }
 
-    public static DbfMetadata fromFields(List<DbfField> fields, DbfFileTypeEnum fileType) {
+    public static DbfMetadata fromFields(List<DbfField> fields, DbfFileTypeEnum fileType) throws IOException {
         DbfMetadata metadata = new DbfMetadata();
 
         metadata.setType(fileType);
