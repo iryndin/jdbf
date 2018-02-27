@@ -3,6 +3,7 @@ package net.iryndin.jdbf.reader;
 import net.iryndin.jdbf.core.*;
 import net.iryndin.jdbf.util.DbfMetadataUtils;
 import net.iryndin.jdbf.util.IOUtils;
+import sun.nio.ch.IOUtil;
 
 import java.io.*;
 import java.util.Arrays;
@@ -55,14 +56,14 @@ public class DbfReader implements Closeable {
         // 1. Allocate buffer
         byte[] bytes = new byte[HEADER_HALF_SIZE];
         // 2. Read 16 bytes
-        if (dbfInputStream.read(bytes) != HEADER_HALF_SIZE)
-        	throw new IOException("The file is corrupted or is not a dbf file");
-        	
+        if (IOUtils.readFully(dbfInputStream, bytes) != HEADER_HALF_SIZE)
+            throw new IOException("The file is corrupted or is not a dbf file");
+
         // 3. Fill header fields
         DbfMetadataUtils.fillHeaderFields(metadata, bytes);
         // 4. Read next 16 bytes (for most DBF types these are reserved bytes)
-        if (dbfInputStream.read(bytes) != HEADER_HALF_SIZE)
-        	throw new IOException("The file is corrupted or is not a dbf file");
+        if (IOUtils.readFully(dbfInputStream, bytes) != HEADER_HALF_SIZE)
+            throw new IOException("The file is corrupted or is not a dbf file");
     }
 
     @Override
@@ -90,7 +91,7 @@ public class DbfReader implements Closeable {
 
     public DbfRecord read() throws IOException {
         Arrays.fill(oneRecordBuffer, (byte)0x0);
-        int readLength = dbfInputStream.read(oneRecordBuffer);
+        int readLength = IOUtils.readFully(dbfInputStream, oneRecordBuffer);
 
         if (readLength < metadata.getOneRecordLength()) {
             return null;
