@@ -31,7 +31,7 @@ public class DbfReader implements Closeable {
         readMetadata();
     }
 
-    public DbfReader(InputStream dbfInputStream, InputStream memoInputStream) throws IOException {
+    public DbfReader(InputStream dbfInputStream, FileInputStream memoInputStream) throws IOException {
         this.dbfInputStream = new BufferedInputStream(dbfInputStream, BUFFER_SIZE);
         this.memoReader = new MemoReader(memoInputStream);
         readMetadata();
