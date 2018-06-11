@@ -3,7 +3,6 @@ package net.iryndin.jdbf.reader;
 import net.iryndin.jdbf.core.*;
 import net.iryndin.jdbf.util.DbfMetadataUtils;
 import net.iryndin.jdbf.util.IOUtils;
-import sun.nio.ch.IOUtil;
 
 import java.io.*;
 import java.util.Arrays;
