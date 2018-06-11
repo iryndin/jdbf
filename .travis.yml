@@ -1,0 +1,12 @@
+language: java
+jdk: openjdk7
+
+before_install:
+
+before_script:
+
+
+script:
+  mvn clean install
+after_failure:
+  

@@ -7,13 +7,50 @@
     <version>2.1.0</version>
     <packaging>jar</packaging>
 
+    <organization>
+          <name>Github</name>
+        <url>http://github.com/iryndin/jdbf</url>
+    </organization>
     <name>jdbf</name>
     <url>http://github.com/iryndin/jdbf</url>
     <description>jdbf - Java library to read/write DBF files</description>
+    
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/iryndin/jdbf/issues</url>
+    </issueManagement>
 
+    <ciManagement>
+        <system>TravisCI</system>
+        <url>https://travis-ci.org/iryndin/jdbf</url>
+    </ciManagement>
+    
+    <distributionManagement>
+        <repository>
+            <id>sonatype-release</id>
+            <layout>default</layout>
+            <name>sonatype releases</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype-snapshot</id>
+            <layout>default</layout>
+            <name>sonatype releases</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <site>
+            <id>website</id>
+            <url>http://github.com/iryndin/jdbf</url>
+        </site>
+    </distributionManagement>
+    
+    <inceptionYear>2012</inceptionYear>
 
     <scm>
         <url>https://github.com/iryndin/jdbf</url>
+        <connection>scm:git:https://github.com/iryndin/jdbf.git</connection>
+        <developerConnection>scm:git:https://github.com/iryndin/jdbf.git</developerConnection>
+        <tag>jdbf-2.1.0</tag>
     </scm>
 
     <licenses>
@@ -61,12 +98,63 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-
+        <javadoc.extra.settings />
         <maven.compiler.version>3.3</maven.compiler.version>
         <junit.version>4.12</junit.version>
     </properties>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.5.3</version>
+                    <configuration>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <preparationGoals>clean install</preparationGoals>
+                        <goals>deploy</goals>
+                        
+                        <tagNameFormat>installcert-@{project.version}</tagNameFormat>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.10.3</version>
+                    <configuration>
+                        <aggregate>true</aggregate>
+                        <additionalparam>${javadoc.extra.settings}</additionalparam>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>aggregate</id>
+                            <goals>
+                                <goal>aggregate</goal>
+                            </goals>
+                            <phase>site</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
+                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.5.3</version>
+                    <configuration>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <preparationGoals>clean install</preparationGoals>
+                        <goals>deploy</goals>
+                        <releaseProfiles>release</releaseProfiles>
+                        <tagNameFormat>jdbf-@{project.version}</tagNameFormat>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -75,5 +163,65 @@
             </plugin>
         </plugins>
     </build>
+    
+    <profiles>
+         <profile>
+            <id>doclint-java8-disable</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <javadoc.extra.settings>-Xdoclint:none</javadoc.extra.settings>
+            </properties>
+        </profile>
+        
+        <!-- START SNIPPET: release-profile -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <inherited>true</inherited>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <configuration>
+                            <updateReleaseInfo>true</updateReleaseInfo>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                   
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <!-- We want to sign the artifact, the POM, and all attached artifacts -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-release-artifacts</id>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
