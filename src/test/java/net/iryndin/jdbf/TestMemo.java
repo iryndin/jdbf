@@ -6,6 +6,8 @@ import net.iryndin.jdbf.core.DbfRecord;
 import net.iryndin.jdbf.reader.DbfReader;
 import org.junit.Test;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -16,11 +18,11 @@ import static org.junit.Assert.assertEquals;
 public class TestMemo {
 
     @Test
-    public void test1() {
+    public void test1() throws FileNotFoundException {
         Charset stringCharset = Charset.forName("cp1252");
 
         InputStream dbf = getClass().getClassLoader().getResourceAsStream("memo1/texto.dbf");
-        InputStream memo = getClass().getClassLoader().getResourceAsStream("memo1/texto.fpt");
+        FileInputStream memo = new FileInputStream(getClass().getClassLoader().getResource("memo1/texto.fpt").getFile());
 
         try (DbfReader reader = new DbfReader(dbf, memo)) {
             DbfMetadata meta = reader.getMetadata();
