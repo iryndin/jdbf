@@ -138,12 +138,18 @@ public class DbfMetadataUtils {
             field.setName(new String(fieldBytes, 0, i));
         }
         // 2. Set type
-        field.setType(DbfFieldTypeEnum.fromChar((char) fieldBytes[11]));
+        DbfFieldTypeEnum fieldType = DbfFieldTypeEnum.fromChar((char) fieldBytes[11]);
+        field.setType(fieldType);
         // 3. Set length
         {
-            int length = fieldBytes[16];
-            if (length < 0) {
-                length = 256 + length;
+            int length = 0;
+            if(fieldType == DbfFieldTypeEnum.Character){
+                length = BitUtils.makeInt(fieldBytes[16], fieldBytes[17]);
+            } else {
+                length = fieldBytes[16];
+                if (length < 0) {
+                    length = 256 + length;
+                }
             }
             field.setLength(length);
         }
