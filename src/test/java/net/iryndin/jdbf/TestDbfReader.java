@@ -75,6 +75,23 @@ public class TestDbfReader {
             }
         }
     }
+
+    @Test
+    public void testTwoBytesLength() throws IOException, ParseException {
+        Charset stringCharset = Charset.forName("Cp866");
+
+        InputStream dbf = getClass().getClassLoader().getResourceAsStream("data1/length_test.dbf");
+
+        DbfRecord rec;
+        try (DbfReader reader = new DbfReader(dbf)) {
+            while ((rec = reader.read()) != null) {
+                rec.setStringCharset(stringCharset);
+                System.out.println(rec.toMap());
+                String value = rec.getString("F19");
+                assertEquals(300, value.length());
+            }
+        }
+    }
     
     @Test
     public void testEmptyStream() throws IOException {
